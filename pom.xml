@@ -46,8 +46,6 @@
     <slf4j.version>1.7.2</slf4j.version>
     <commons-io.version>2.4</commons-io.version>
     <guava.version>28.0-jre</guava.version>
-    <mybatis.version>3.5.1</mybatis.version>
-    <druid.version>1.1.10</druid.version>
   </properties>
   <dependencyManagement>
     <dependencies>

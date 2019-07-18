@@ -1,5 +1,7 @@
 package org.snowflake.plus.core;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -7,11 +9,9 @@ import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+@Slf4j
 public class Utils {
-    private static final Logger logger = LoggerFactory.getLogger(Utils.class);
 
     public static String getIp() {
         String ip;
@@ -21,7 +21,7 @@ public class Utils {
             ip = (!ipList.isEmpty()) ? ipList.get(0) : "";
         } catch (Exception ex) {
             ip = "";
-            logger.warn("Utils get IP warn", ex);
+            log.warn("Utils get IP warn", ex);
         }
         return ip;
     }
@@ -34,7 +34,7 @@ public class Utils {
             ip = (!ipList.isEmpty()) ? ipList.get(0) : "";
         } catch (Exception ex) {
             ip = "";
-            logger.warn("Utils get IP warn", ex);
+            log.warn("Utils get IP warn", ex);
         }
         return ip;
     }

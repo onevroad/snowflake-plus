@@ -1,18 +1,17 @@
 package org.snowflake.plus.core;
 
 import com.google.common.base.Preconditions;
-import java.util.Random;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+import java.util.Random;
+
+@Slf4j
 public class SnowflakeIDGenImpl implements SnowflakeIDGen {
 
     @Override
     public boolean init() {
         return true;
     }
-
-    static private final Logger LOGGER = LoggerFactory.getLogger(SnowflakeIDGenImpl.class);
 
     private final long twepoch = 1288834974657L;
     private final long workerIdBits = 10L;
@@ -27,12 +26,12 @@ public class SnowflakeIDGenImpl implements SnowflakeIDGen {
     private long lastTimestamp = -1L;
     private static final Random RANDOM = new Random();
 
-    public SnowflakeIDGenImpl(String zkAddress, int port) {
-        SnowflakeZookeeperHolder holder = new SnowflakeZookeeperHolder(Utils.getIp(), String.valueOf(port), zkAddress);
+    public SnowflakeIDGenImpl(String name, String zkAddress, int port) {
+        SnowflakeZookeeperHolder holder = new SnowflakeZookeeperHolder(name, Utils.getIp(), String.valueOf(port), zkAddress);
         boolean initFlag = holder.init();
         if (initFlag) {
             workerId = holder.getWorkerID();
-            LOGGER.info("START SUCCESS USE ZK WORKERID-{}", workerId);
+            log.info("START SUCCESS USE ZK WORKERID-{}", workerId);
         } else {
             Preconditions.checkArgument(initFlag, "Snowflake Id Gen is not init ok");
         }
@@ -52,7 +51,7 @@ public class SnowflakeIDGenImpl implements SnowflakeIDGen {
                         return new Result(-1, Status.EXCEPTION);
                     }
                 } catch (InterruptedException e) {
-                    LOGGER.error("wait interrupted");
+                    log.error("wait interrupted");
                     return new Result(-2, Status.EXCEPTION);
                 }
             } else {

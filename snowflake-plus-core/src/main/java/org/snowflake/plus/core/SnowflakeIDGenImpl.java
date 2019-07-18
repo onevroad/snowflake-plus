@@ -13,19 +13,35 @@ public class SnowflakeIDGenImpl implements SnowflakeIDGen {
         return true;
     }
 
-    private final long twepoch = 1288834974657L;
+    /**
+     * 初始时间：2019-07-18 08:00:00 (UTC+8)
+     */
+    private final long twepoch = 1563408000000L;
+    /**
+     * workerId的bit位数
+     */
     private final long workerIdBits = 10L;
     /**
      * 最大能够分配的workerId =1023
      */
     private final long maxWorkerId = ~(-1L << workerIdBits);
+    /**
+     * sequence的bit位数
+     */
     private final long sequenceBits = 12L;
+
     private final long workerIdShift = sequenceBits;
+
     private final long timestampLeftShift = sequenceBits + workerIdBits;
+
     private final long sequenceMask = ~(-1L << sequenceBits);
+
     private long workerId;
+
     private long sequence = 0L;
+
     private long lastTimestamp = -1L;
+
     private static final Random RANDOM = new Random();
 
     public SnowflakeIDGenImpl(String name, String zkAddress, int port) {
@@ -41,7 +57,7 @@ public class SnowflakeIDGenImpl implements SnowflakeIDGen {
     }
 
     @Override
-    public synchronized Result get(String key) {
+    public synchronized Result get() {
         long timestamp = timeGen();
         if (timestamp < lastTimestamp) {
             long offset = lastTimestamp - timestamp;

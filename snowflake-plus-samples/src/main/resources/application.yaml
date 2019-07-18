@@ -1,0 +1,10 @@
+server:
+  port: 8001
+spring:
+  application:
+    name: snowflake-plus-sample
+snowflake:
+  plus:
+    name: snowflake-plus-sample
+    port: 8001
+    zk-address: localhost:2181

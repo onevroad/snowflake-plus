@@ -17,7 +17,7 @@ public class SnowflakeService {
         }
     }
 
-    public Result getId(String key) {
-        return idGen.get(key);
+    public Result getId() {
+        return idGen.get();
     }
 }

@@ -27,6 +27,11 @@
       <artifactId>commons-io</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+    </dependency>
+
     <!--zk-->
     <dependency>
       <groupId>org.apache.curator</groupId>

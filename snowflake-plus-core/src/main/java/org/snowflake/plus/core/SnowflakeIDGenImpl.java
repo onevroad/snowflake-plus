@@ -15,7 +15,9 @@ public class SnowflakeIDGenImpl implements SnowflakeIDGen {
 
     private final long twepoch = 1288834974657L;
     private final long workerIdBits = 10L;
-    //最大能够分配的workerId =1023
+    /**
+     * 最大能够分配的workerId =1023
+     */
     private final long maxWorkerId = ~(-1L << workerIdBits);
     private final long sequenceBits = 12L;
     private final long workerIdShift = sequenceBits;

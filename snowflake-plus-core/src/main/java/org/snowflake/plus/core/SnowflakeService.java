@@ -6,7 +6,7 @@ import org.snowflake.plus.core.exception.InitException;
 @Slf4j
 public class SnowflakeService {
 
-    SnowflakeIDGen idGen;
+    private SnowflakeIDGen idGen;
 
     public SnowflakeService(String name, String zkAddress, int port) throws InitException {
         idGen = new SnowflakeIDGenImpl(name, zkAddress, port);

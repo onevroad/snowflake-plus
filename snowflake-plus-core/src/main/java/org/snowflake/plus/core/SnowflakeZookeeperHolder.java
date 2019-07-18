@@ -3,15 +3,8 @@ package org.snowflake.plus.core;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
@@ -19,12 +12,19 @@ import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryUntilElapsed;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.data.Stat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.snowflake.plus.core.exception.CheckLastTimeException;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+@Slf4j
 public class SnowflakeZookeeperHolder {
-    private static final Logger LOGGER = LoggerFactory.getLogger(SnowflakeZookeeperHolder.class);
     //保存自身的key  ip:port-000000001
     private String zkAddressNode = null;
     //保存自身的key ip:port
@@ -65,8 +65,10 @@ public class SnowflakeZookeeperHolder {
                 ScheduledUploadData(curator, zkAddressNode);
                 return true;
             } else {
-                Map<String, Integer> nodeMap = Maps.newHashMap();//ip:port->00001
-                Map<String, String> realNode = Maps.newHashMap();//ip:port->(ipport-000001)
+                //ip:port->00001
+                Map<String, Integer> nodeMap = Maps.newHashMap();
+                //ip:port->(ipport-000001)
+                Map<String, String> realNode = Maps.newHashMap();
                 //存在根节点,先检查是否有属于自己的根节点
                 List<String> keys = curator.getChildren().forPath(pathForever);
                 for (String key : keys) {
@@ -74,18 +76,19 @@ public class SnowflakeZookeeperHolder {
                     realNode.put(nodeKey[0], key);
                     nodeMap.put(nodeKey[0], Integer.parseInt(nodeKey[1]));
                 }
-                Integer workerid = nodeMap.get(listenAddress);
-                if (workerid != null) {
+                Integer workerId = nodeMap.get(listenAddress);
+                if (workerId != null) {
                     //有自己的节点,zkAddressNode=ip:port
                     zkAddressNode = pathForever + "/" + realNode.get(listenAddress);
-                    workerID = workerid;//启动worder时使用会使用
+                    //启动worker时使用会使用
+                    workerID = workerId;
                     if (!checkInitTimeStamp(curator, zkAddressNode)) {
                         throw new CheckLastTimeException("init timestamp check error,forever node timestamp gt this node time");
                     }
                     //准备创建临时节点
                     doService(curator);
                     updateLocalWorkerID(workerID);
-                    LOGGER.info("[Old NODE]find forever node have this endpoint ip-{} port-{} workid-{} childnode and start SUCCESS", ip, port, workerID);
+                    log.info("[Old NODE]find forever node have this endpoint ip-{} port-{} workID-{} childNode and start SUCCESS", ip, port, workerID);
                 } else {
                     //表示新启动的节点,创建持久节点 ,不用check时间
                     String newNode = createNode(curator);
@@ -94,18 +97,18 @@ public class SnowflakeZookeeperHolder {
                     workerID = Integer.parseInt(nodeKey[1]);
                     doService(curator);
                     updateLocalWorkerID(workerID);
-                    LOGGER.info("[New NODE]can not find node on forever node that endpoint ip-{} port-{} workid-{},create own node on forever node and start SUCCESS ", ip, port, workerID);
+                    log.info("[New NODE]can not find node on forever node that endpoint ip-{} port-{} workID-{},create own node on forever node and start SUCCESS ", ip, port, workerID);
                 }
             }
         } catch (Exception e) {
-            LOGGER.error("Start node ERROR {}", e);
+            log.error("Start node ERROR {}", e.getMessage(), e);
             try {
                 Properties properties = new Properties();
                 properties.load(new FileInputStream(new File(propPath.replace("{port}", port + ""))));
                 workerID = Integer.valueOf(properties.getProperty("workerID"));
-                LOGGER.warn("START FAILED ,use local node file properties workerID-{}", workerID);
+                log.warn("START FAILED ,use local node file properties workerID-{}", workerID);
             } catch (Exception e1) {
-                LOGGER.error("Read file error ", e1);
+                log.error("Read file error ", e1);
                 return false;
             }
         }
@@ -113,31 +116,21 @@ public class SnowflakeZookeeperHolder {
     }
 
     private void doService(CuratorFramework curator) {
-        ScheduledUploadData(curator, zkAddressNode);// /snowflake_forever/ip:port-000000001
+        // /snowflake_forever/ip:port-000000001
+        ScheduledUploadData(curator, zkAddressNode);
     }
 
-    private void ScheduledUploadData(final CuratorFramework curator, final String zk_AddressNode) {
-        Executors.newSingleThreadScheduledExecutor(new ThreadFactory() {
-            @Override
-            public Thread newThread(Runnable r) {
-                Thread thread = new Thread(r, "schedule-upload-time");
-                thread.setDaemon(true);
-                return thread;
-            }
-        }).scheduleWithFixedDelay(new Runnable() {
-            @Override
-            public void run() {
-                updateNewData(curator, zk_AddressNode);
-            }
-        }, 1L, 3L, TimeUnit.SECONDS);//每3s上报数据
-
+    private void ScheduledUploadData(final CuratorFramework curator, final String zkAddressNode) {
+        ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1, new ThreadFactoryBuilder().setNameFormat("schedule-upload-time").build());
+        //每3s上报数据
+        executor.scheduleWithFixedDelay(() -> updateNewData(curator, zkAddressNode), 1L, 3L, TimeUnit.SECONDS);
     }
 
-    private boolean checkInitTimeStamp(CuratorFramework curator, String zk_AddressNode) throws Exception {
-        byte[] bytes = curator.getData().forPath(zk_AddressNode);
+    private boolean checkInitTimeStamp(CuratorFramework curator, String zkAddressNode) throws Exception {
+        byte[] bytes = curator.getData().forPath(zkAddressNode);
         Endpoint endPoint = deBuildData(new String(bytes));
         //该节点的时间不能小于最后一次上报的时间
-        return !(endPoint.getTimestamp() > System.currentTimeMillis());
+        return endPoint.getTimestamp() <= System.currentTimeMillis();
     }
 
     /**
@@ -151,7 +144,7 @@ public class SnowflakeZookeeperHolder {
         try {
             return curator.create().creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT_SEQUENTIAL).forPath(pathForever + "/" + listenAddress + "-", buildData().getBytes());
         } catch (Exception e) {
-            LOGGER.error("create node error msg {} ", e.getMessage());
+            log.error("create node error msg {} ", e.getMessage());
             throw e;
         }
     }
@@ -164,7 +157,7 @@ public class SnowflakeZookeeperHolder {
             curator.setData().forPath(path, buildData().getBytes());
             lastUpdateTime = System.currentTimeMillis();
         } catch (Exception e) {
-            LOGGER.info("update init data error path is {} error is {}", path, e);
+            log.info("update init data error path is {} error is {}", path, e);
         }
     }
 
@@ -187,36 +180,36 @@ public class SnowflakeZookeeperHolder {
     }
 
     /**
-     * 在节点文件系统上缓存一个workid值,zk失效,机器重启时保证能够正常启动
+     * 在节点文件系统上缓存一个workID值,zk失效,机器重启时保证能够正常启动
      *
      * @param workerID
      */
     private void updateLocalWorkerID(int workerID) {
-        File LeafconfFile = new File(propPath.replace("{port}", port));
-        boolean exists = LeafconfFile.exists();
-        LOGGER.info("file exists status is {}", exists);
+        File snowflakeConfFile = new File(propPath.replace("{port}", port));
+        boolean exists = snowflakeConfFile.exists();
+        log.info("file exists status is {}", exists);
         if (exists) {
             try {
-                FileUtils.writeStringToFile(LeafconfFile, "workerID=" + workerID, false);
-                LOGGER.info("update file cache workerID is {}", workerID);
+                FileUtils.writeStringToFile(snowflakeConfFile, "workerID=" + workerID, false);
+                log.info("update file cache workerID is {}", workerID);
             } catch (IOException e) {
-                LOGGER.error("update file cache error ", e);
+                log.error("update file cache error ", e);
             }
         } else {
             //不存在文件,父目录页肯定不存在
             try {
-                boolean mkdirs = LeafconfFile.getParentFile().mkdirs();
-                LOGGER.info("init local file cache create parent dis status is {}, worker id is {}", mkdirs, workerID);
+                boolean mkdirs = snowflakeConfFile.getParentFile().mkdirs();
+                log.info("init local file cache create parent dis status is {}, worker id is {}", mkdirs, workerID);
                 if (mkdirs) {
-                    if (LeafconfFile.createNewFile()) {
-                        FileUtils.writeStringToFile(LeafconfFile, "workerID=" + workerID, false);
-                        LOGGER.info("local file cache workerID is {}", workerID);
+                    if (snowflakeConfFile.createNewFile()) {
+                        FileUtils.writeStringToFile(snowflakeConfFile, "workerID=" + workerID, false);
+                        log.info("local file cache workerID is {}", workerID);
                     }
                 } else {
-                    LOGGER.warn("create parent dir error===");
+                    log.warn("create parent dir error===");
                 }
             } catch (IOException e) {
-                LOGGER.warn("craete workerID conf file error", e);
+                log.warn("create workerID conf file error", e);
             }
         }
     }

@@ -43,9 +43,10 @@
     <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
     <spring-boot.version>2.1.5.RELEASE</spring-boot.version>
     <perf4j.version>0.9.16</perf4j.version>
-    <slf4j.version>1.7.2</slf4j.version>
     <commons-io.version>2.4</commons-io.version>
     <guava.version>28.0-jre</guava.version>
+    <curator.version>4.2.0</curator.version>
+    <jackson-databind.version>2.9.9</jackson-databind.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -68,6 +69,7 @@
         <artifactId>commons-io</artifactId>
         <version>${commons-io.version}</version>
       </dependency>
+
       <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
@@ -79,10 +81,23 @@
         <artifactId>perf4j</artifactId>
         <version>${perf4j.version}</version>
       </dependency>
+
+      <!--zk-->
       <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-api</artifactId>
-        <version>${slf4j.version}</version>
+        <groupId>org.apache.curator</groupId>
+        <artifactId>curator-recipes</artifactId>
+        <version>${curator.version}</version>
+        <exclusions>
+          <exclusion>
+            <artifactId>log4j</artifactId>
+            <groupId>log4j</groupId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.core</groupId>
+        <artifactId>jackson-databind</artifactId>
+        <version>${jackson-databind.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

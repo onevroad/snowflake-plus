@@ -13,6 +13,10 @@ import java.util.List;
 @Slf4j
 public class Utils {
 
+    /**
+     * 获取IP
+     * @return
+     */
     public static String getIp() {
         String ip;
         try {
@@ -26,6 +30,11 @@ public class Utils {
         return ip;
     }
 
+    /**
+     * 获取指定网卡的IP
+     * @param interfaceName 网卡名称
+     * @return
+     */
     public static String getIp(String interfaceName) {
         String ip;
         interfaceName = interfaceName.trim();

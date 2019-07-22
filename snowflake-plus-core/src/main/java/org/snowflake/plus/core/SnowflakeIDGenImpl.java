@@ -8,11 +8,6 @@ import java.util.Random;
 @Slf4j
 public class SnowflakeIDGenImpl implements SnowflakeIDGen {
 
-    @Override
-    public boolean init() {
-        return true;
-    }
-
     /**
      * 初始时间：2019-07-18 08:00:00 (UTC+8)
      */
@@ -42,18 +37,26 @@ public class SnowflakeIDGenImpl implements SnowflakeIDGen {
 
     private long lastTimestamp = -1L;
 
+    private boolean initFlag = false;
+
     private static final Random RANDOM = new Random();
 
     public SnowflakeIDGenImpl(String name, String zkAddress, int port) {
         SnowflakeZookeeperHolder holder = new SnowflakeZookeeperHolder(name, Utils.getIp(), String.valueOf(port), zkAddress);
         boolean initFlag = holder.init();
         if (initFlag) {
+            this.initFlag = true;
             workerId = holder.getWorkerID();
             log.info("START SUCCESS USE ZK WORKERID-{}", workerId);
         } else {
             Preconditions.checkArgument(initFlag, "Snowflake Id Gen is not init ok");
         }
         Preconditions.checkArgument(workerId >= 0 && workerId <= maxWorkerId, "workerID must gte 0 and lte 1023");
+    }
+
+    @Override
+    public boolean init() {
+        return initFlag;
     }
 
     @Override

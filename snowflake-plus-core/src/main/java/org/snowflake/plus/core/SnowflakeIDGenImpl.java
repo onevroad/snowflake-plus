@@ -41,17 +41,22 @@ public class SnowflakeIDGenImpl implements SnowflakeIDGen {
 
     private static final Random RANDOM = new Random();
 
-    public SnowflakeIDGenImpl(String name, String zkAddress, int port) {
+    public SnowflakeIDGenImpl(String name, String zkAddress, Integer port, Integer workerId) {
         SnowflakeZookeeperHolder holder = new SnowflakeZookeeperHolder(name, Utils.getIp(), String.valueOf(port), zkAddress);
         boolean initFlag = holder.init();
         if (initFlag) {
             this.initFlag = true;
-            workerId = holder.getWorkerID();
-            log.info("START SUCCESS USE ZK WORKERID-{}", workerId);
+            this.workerId = holder.getWorkerID();
+            log.info("START SUCCESS USE ZK WORKERID-{}", this.workerId);
         } else {
-            Preconditions.checkArgument(initFlag, "Snowflake Id Gen is not init ok");
+            this.workerId = workerId;
+            if (workerId == 0) {
+                log.info("START SUCCESS USE DEFAULT WORKERID-{}", this.workerId);
+            } else {
+                log.info("START SUCCESS USE CONFIG WORKERID-{}", this.workerId);
+            }
         }
-        Preconditions.checkArgument(workerId >= 0 && workerId <= maxWorkerId, "workerID must gte 0 and lte 1023");
+        Preconditions.checkArgument(this.workerId >= 0 && this.workerId <= maxWorkerId, "workerID must gte 0 and lte 1023");
     }
 
     @Override

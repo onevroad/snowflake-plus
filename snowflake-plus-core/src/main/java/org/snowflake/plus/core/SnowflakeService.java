@@ -8,8 +8,8 @@ public class SnowflakeService {
 
     private SnowflakeIDGen idGen;
 
-    public SnowflakeService(String name, String zkAddress, int port) throws InitException {
-        idGen = new SnowflakeIDGenImpl(name, zkAddress, port);
+    public SnowflakeService(String name, String zkAddress, Integer port, Integer workerId) throws InitException {
+        idGen = new SnowflakeIDGenImpl(name, zkAddress, port, workerId);
         if (idGen.init()) {
             log.info("Snowflake Service Init Successfully");
         } else {

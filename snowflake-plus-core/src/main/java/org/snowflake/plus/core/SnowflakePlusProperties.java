@@ -12,4 +12,6 @@ public class SnowflakePlusProperties {
     private Integer port;
 
     private String zkAddress;
+
+    private Integer workerId = 0;
 }

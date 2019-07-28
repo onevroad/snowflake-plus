@@ -15,6 +15,6 @@ public class SnowflakePlusAutoConfiguration {
 
     @Bean
     public SnowflakeService snowflakeService() throws InitException {
-        return new SnowflakeService(properties.getName(), properties.getZkAddress(), properties.getPort());
+        return new SnowflakeService(properties.getName(), properties.getZkAddress(), properties.getPort(), properties.getWorkerId());
     }
 }

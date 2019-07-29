@@ -17,7 +17,7 @@ public class SnowflakeService {
         }
     }
 
-    public Result getId() {
+    public IdResult getId() {
         return idGen.get();
     }
 }

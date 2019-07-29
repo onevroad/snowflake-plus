@@ -11,7 +11,7 @@ import java.util.Enumeration;
 import java.util.List;
 
 @Slf4j
-public class Utils {
+public class IpUtils {
 
     /**
      * 获取IP
@@ -25,7 +25,7 @@ public class Utils {
             ip = (!ipList.isEmpty()) ? ipList.get(0) : "";
         } catch (Exception ex) {
             ip = "";
-            log.warn("Utils get IP warn", ex);
+            log.warn("IpUtils get IP warn", ex);
         }
         return ip;
     }
@@ -43,7 +43,7 @@ public class Utils {
             ip = (!ipList.isEmpty()) ? ipList.get(0) : "";
         } catch (Exception ex) {
             ip = "";
-            log.warn("Utils get IP warn", ex);
+            log.warn("IpUtils get IP warn", ex);
         }
         return ip;
     }

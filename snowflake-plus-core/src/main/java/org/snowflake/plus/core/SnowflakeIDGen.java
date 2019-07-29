@@ -4,7 +4,7 @@ public interface SnowflakeIDGen {
     /**
      * 获取ID
      */
-    Result get();
+    IdResult get();
 
     /**
      * 初始化服务

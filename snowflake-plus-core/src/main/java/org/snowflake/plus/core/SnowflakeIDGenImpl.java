@@ -42,7 +42,7 @@ public class SnowflakeIDGenImpl implements SnowflakeIDGen {
     private static final Random RANDOM = new Random();
 
     public SnowflakeIDGenImpl(String name, String zkAddress, Integer port, Integer workerId) {
-        SnowflakeZookeeperHolder holder = new SnowflakeZookeeperHolder(name, Utils.getIp(), String.valueOf(port), zkAddress);
+        SnowflakeZookeeperHolder holder = new SnowflakeZookeeperHolder(name, IpUtils.getIp(), String.valueOf(port), zkAddress);
         boolean initFlag = holder.init();
         if (initFlag) {
             this.initFlag = true;
@@ -65,7 +65,7 @@ public class SnowflakeIDGenImpl implements SnowflakeIDGen {
     }
 
     @Override
-    public synchronized Result get() {
+    public synchronized IdResult get() {
         long timestamp = timeGen();
         if (timestamp < lastTimestamp) {
             long offset = lastTimestamp - timestamp;
@@ -74,14 +74,14 @@ public class SnowflakeIDGenImpl implements SnowflakeIDGen {
                     wait(offset << 1);
                     timestamp = timeGen();
                     if (timestamp < lastTimestamp) {
-                        return new Result(-1, Status.EXCEPTION);
+                        return new IdResult(-1, Status.EXCEPTION);
                     }
                 } catch (InterruptedException e) {
                     log.error("wait interrupted");
-                    return new Result(-2, Status.EXCEPTION);
+                    return new IdResult(-2, Status.EXCEPTION);
                 }
             } else {
-                return new Result(-3, Status.EXCEPTION);
+                return new IdResult(-3, Status.EXCEPTION);
             }
         }
         if (lastTimestamp == timestamp) {
@@ -97,7 +97,7 @@ public class SnowflakeIDGenImpl implements SnowflakeIDGen {
         }
         lastTimestamp = timestamp;
         long id = ((timestamp - twepoch) << timestampLeftShift) | (workerId << workerIdShift) | sequence;
-        return new Result(id, Status.SUCCESS);
+        return new IdResult(id, Status.SUCCESS);
 
     }
 

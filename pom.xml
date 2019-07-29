@@ -34,7 +34,6 @@
 
   <modules>
     <module>snowflake-plus-core</module>
-    <module>snowflake-plus-samples</module>
   </modules>
 
   <properties>

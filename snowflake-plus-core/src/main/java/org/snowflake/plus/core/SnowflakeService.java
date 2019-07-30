@@ -17,7 +17,11 @@ public class SnowflakeService {
         }
     }
 
-    public IdResult getId() {
-        return idGen.get();
+    public Long getId() {
+        IdResult idResult = idGen.get();
+        if (idResult.getStatus().equals(Status.EXCEPTION)) {
+            log.error("Generate id error: {}", idResult.toString());
+        }
+        return idResult.getId();
     }
 }

@@ -16,8 +16,4 @@ public class SnowflakeIdController {
     public IdResult getId() {
         return snowflakeService.getId();
     }
-
-    public static void main(String[] args) {
-        System.out.println(System.currentTimeMillis());
-    }
 }

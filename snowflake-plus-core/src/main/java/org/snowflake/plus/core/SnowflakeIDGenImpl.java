@@ -43,6 +43,7 @@ public class SnowflakeIDGenImpl implements SnowflakeIDGen {
 
     public SnowflakeIDGenImpl(long workerId) {
         this.workerId = workerId;
+        this.initFlag = true;
         checkWorkId();
     }
 

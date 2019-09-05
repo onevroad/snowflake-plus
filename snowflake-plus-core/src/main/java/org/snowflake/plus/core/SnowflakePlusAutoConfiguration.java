@@ -29,7 +29,7 @@ public class SnowflakePlusAutoConfiguration {
     }
 
     @Bean
-    public SnowflakeService snowflakeService(SnowflakeResource resource, SnowflakeNodeHolder holder) throws InitException {
+    public SnowflakeService snowflakeService(SnowflakeResource resource, @Autowired(required = false) SnowflakeNodeHolder holder) throws InitException {
         return new SnowflakeService(resource, holder);
     }
 }

@@ -47,3 +47,6 @@ public class IdProducer {
     }
 }
 ```
+
+## Feature
+- 支持其他的注册中心（Eureka，Consul等）

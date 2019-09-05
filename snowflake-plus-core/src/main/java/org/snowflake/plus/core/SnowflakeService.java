@@ -14,11 +14,7 @@ public class SnowflakeService {
         } else {
             idGen = new SnowflakeIDGenImpl(resource, holder);
         }
-        if (idGen.init()) {
-            log.info("Snowflake Service Init Successfully");
-        } else {
-            throw new InitException("Snowflake Service Init Fail");
-        }
+        log.info("Snowflake Service Init Successfully");
     }
 
     public long getId() {

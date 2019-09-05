@@ -37,13 +37,11 @@ public class SnowflakeIDGenImpl implements SnowflakeIDGen {
 
     private long lastTimestamp = -1L;
 
-    private boolean initFlag = false;
-
     private static final Random RANDOM = new Random();
 
     public SnowflakeIDGenImpl(long workerId) {
         this.workerId = workerId;
-        this.initFlag = true;
+        log.info("START SUCCESS USE CONFIG WORKERID-{}", this.workerId);
         checkWorkId();
     }
 
@@ -51,20 +49,21 @@ public class SnowflakeIDGenImpl implements SnowflakeIDGen {
         SnowflakeLocalConfigService localConfigService = new SnowflakeLocalConfigService(resource);
         boolean initFlag = holder.init();
         if (initFlag) {
-            this.initFlag = true;
             this.workerId = holder.getWorkerId();
             resource.setWorkerId(this.workerId);
-            log.info("START SUCCESS USE ZK WORKERID-{}", this.workerId);
+            log.info("START SUCCESS USE {} WORKERID-{}", resource.getServerType(), this.workerId);
         } else {
+            boolean loadFileFlag = false;
             try {
                 this.workerId = localConfigService.loadLocalWorkId();
                 resource.setWorkerId(this.workerId);
+                loadFileFlag = true;
             } catch (Exception e) {
                 log.error("Read file error ", e);
                 this.workerId = resource.getWorkerId();
             }
-            if (this.workerId == 0) {
-                log.info("START SUCCESS USE DEFAULT WORKERID-{}", this.workerId);
+            if (loadFileFlag) {
+                log.info("START SUCCESS USE LOCAL FILE WORKERID-{}", this.workerId);
             } else {
                 log.info("START SUCCESS USE CONFIG WORKERID-{}", this.workerId);
             }
@@ -74,11 +73,6 @@ public class SnowflakeIDGenImpl implements SnowflakeIDGen {
 
     private void checkWorkId() {
         Preconditions.checkArgument(this.workerId >= 0 && this.workerId <= maxWorkerId, "workerID must gte 0 and lte 1023");
-    }
-
-    @Override
-    public boolean init() {
-        return initFlag;
     }
 
     @Override

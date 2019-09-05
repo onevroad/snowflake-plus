@@ -11,12 +11,12 @@ import java.util.Properties;
 @Slf4j
 public class SnowflakeLocalConfigService {
 
-    private String port;
+    private String listenPort;
     private String propPath;
 
-    public SnowflakeLocalConfigService(String name, String port) {
-        this.port = port;
-        this.propPath = System.getProperty("java.io.tmpdir") + File.separator + name + "/snowflake-conf/{port}/workerId.properties";
+    public SnowflakeLocalConfigService(SnowflakeResource resource) {
+        this.listenPort = resource.getListenPort();
+        this.propPath = System.getProperty("java.io.tmpdir") + File.separator + resource.getName() + "/snowflake-conf/{port}/workerId.properties";
     }
 
     /**
@@ -25,7 +25,7 @@ public class SnowflakeLocalConfigService {
      * @param workerId
      */
     public void updateLocalWorkerId(int workerId) {
-        File snowflakeConfFile = new File(propPath.replace("{port}", port));
+        File snowflakeConfFile = new File(propPath.replace("{port}", listenPort));
         boolean exists = snowflakeConfFile.exists();
         log.info("file exists status is {}", exists);
         if (exists) {
@@ -56,7 +56,7 @@ public class SnowflakeLocalConfigService {
     
     public int loadLocalWorkId() throws IOException {
         Properties properties = new Properties();
-        properties.load(new FileInputStream(new File(propPath.replace("{port}", port))));
+        properties.load(new FileInputStream(new File(propPath.replace("{port}", listenPort))));
         int workerId = Integer.parseInt(properties.getProperty("workerId"));
         log.warn("START FAILED ,use local node file properties workerId-{}", workerId);
         return workerId;

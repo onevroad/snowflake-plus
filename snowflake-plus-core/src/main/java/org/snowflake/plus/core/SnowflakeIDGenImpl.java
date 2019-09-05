@@ -41,24 +41,26 @@ public class SnowflakeIDGenImpl implements SnowflakeIDGen {
 
     private static final Random RANDOM = new Random();
 
-    public SnowflakeIDGenImpl(int workerId) {
+    public SnowflakeIDGenImpl(long workerId) {
         this.workerId = workerId;
         checkWorkId();
     }
 
-    public SnowflakeIDGenImpl(String name, int port, int workerId, SnowflakeNodeHolder holder) {
-        SnowflakeLocalConfigService localConfigService = new SnowflakeLocalConfigService(name, String.valueOf(port));
+    public SnowflakeIDGenImpl(SnowflakeResource resource, SnowflakeNodeHolder holder) {
+        SnowflakeLocalConfigService localConfigService = new SnowflakeLocalConfigService(resource);
         boolean initFlag = holder.init();
         if (initFlag) {
             this.initFlag = true;
             this.workerId = holder.getWorkerId();
+            resource.setWorkerId(this.workerId);
             log.info("START SUCCESS USE ZK WORKERID-{}", this.workerId);
         } else {
             try {
                 this.workerId = localConfigService.loadLocalWorkId();
+                resource.setWorkerId(this.workerId);
             } catch (Exception e) {
                 log.error("Read file error ", e);
-                this.workerId = workerId;
+                this.workerId = resource.getWorkerId();
             }
             if (this.workerId == 0) {
                 log.info("START SUCCESS USE DEFAULT WORKERID-{}", this.workerId);

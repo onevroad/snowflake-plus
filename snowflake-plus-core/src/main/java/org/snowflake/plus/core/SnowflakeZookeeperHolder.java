@@ -31,18 +31,18 @@ public class SnowflakeZookeeperHolder extends SnowflakeNodeHolder {
     private String ip;
     private long lastUpdateTime;
 
-    public SnowflakeZookeeperHolder(String name, String port, String address) {
-        super(name, port, address);
+    public SnowflakeZookeeperHolder(SnowflakeResource resource) {
+        super(resource);
         this.ip = IpUtils.getIp();
-        this.listenAddress = ip + ":" + port;
-        this.prefixZkPath = "/snowflake/" + name;
+        this.listenAddress = ip + ":" + resource.getListenPort();
+        this.prefixZkPath = "/snowflake/" + resource.getName();
         this.pathForever = prefixZkPath + "/forever";
     }
 
     @Override
     public boolean init() {
         try {
-            CuratorFramework curator = createWithOptions(address, new RetryUntilElapsed(1000, 4), 10000, 6000);
+            CuratorFramework curator = createWithOptions(resource.getAddress(), new RetryUntilElapsed(1000, 4), 10000, 6000);
             curator.start();
             Stat stat = curator.checkExists().forPath(pathForever);
             if (stat == null) {
@@ -54,7 +54,7 @@ public class SnowflakeZookeeperHolder extends SnowflakeNodeHolder {
                 return true;
             } else {
                 //ip:port->00001
-                Map<String, Integer> nodeMap = Maps.newHashMap();
+                Map<String, Long> nodeMap = Maps.newHashMap();
                 //ip:port->(ipport-000001)
                 Map<String, String> realNode = Maps.newHashMap();
                 //存在根节点,先检查是否有属于自己的根节点
@@ -62,28 +62,28 @@ public class SnowflakeZookeeperHolder extends SnowflakeNodeHolder {
                 for (String key : keys) {
                     String[] nodeKey = key.split("-");
                     realNode.put(nodeKey[0], key);
-                    nodeMap.put(nodeKey[0], Integer.parseInt(nodeKey[1]));
+                    nodeMap.put(nodeKey[0], Long.parseLong(nodeKey[1]));
                 }
-                Integer workerIdOnNode = nodeMap.get(listenAddress);
+                Long workerIdOnNode = nodeMap.get(listenAddress);
                 if (workerIdOnNode != null) {
                     //有自己的节点,zkAddressNode=ip:port
                     zkAddressNode = pathForever + "/" + realNode.get(listenAddress);
                     //启动worker时使用会使用
-                    workerId = workerIdOnNode;
+                    resource.setWorkerId(workerIdOnNode);
                     if (!checkInitTimeStamp(curator, zkAddressNode)) {
                         throw new CheckLastTimeException("init timestamp check error,forever node timestamp gt this node time");
                     }
                     //准备创建临时节点
                     doService(curator);
-                    log.info("[Old NODE]find forever node have this endpoint ip-{} port-{} workID-{} childNode and start SUCCESS", ip, port, workerId);
+                    log.info("[Old NODE]find forever node have this endpoint ip-{} port-{} workID-{} childNode and start SUCCESS", ip, resource.getListenPort(), resource.getWorkerId());
                 } else {
                     //表示新启动的节点,创建持久节点 ,不用check时间
                     String newNode = createNode(curator);
                     zkAddressNode = newNode;
                     String[] nodeKey = newNode.split("-");
-                    workerId = Integer.parseInt(nodeKey[1]);
+                    resource.setWorkerId(Long.parseLong(nodeKey[1]));
                     doService(curator);
-                    log.info("[New NODE]can not find node on forever node that endpoint ip-{} port-{} workID-{},create own node on forever node and start SUCCESS ", ip, port, workerId);
+                    log.info("[New NODE]can not find node on forever node that endpoint ip-{} port-{} workID-{},create own node on forever node and start SUCCESS ", ip, resource.getListenPort(), resource.getWorkerId());
                 }
             }
         } catch (Exception e) {
@@ -145,7 +145,7 @@ public class SnowflakeZookeeperHolder extends SnowflakeNodeHolder {
      * @return
      */
     private String buildData() throws JsonProcessingException {
-        Endpoint endpoint = new Endpoint(ip, port, System.currentTimeMillis());
+        Endpoint endpoint = new Endpoint(ip, resource.getListenPort(), System.currentTimeMillis());
         ObjectMapper mapper = new ObjectMapper();
         String json = mapper.writeValueAsString(endpoint);
         return json;

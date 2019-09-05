@@ -8,13 +8,11 @@ public class SnowflakeService {
 
     private SnowflakeIDGen idGen;
 
-    public SnowflakeService(String name, String address, int port, int workerId, SnowflakePlusProperties.ServerType serverType) throws InitException {
-        if (serverType.equals(SnowflakePlusProperties.ServerType.local)) {
-            idGen = new SnowflakeIDGenImpl(workerId);
-        } else if (serverType.equals(SnowflakePlusProperties.ServerType.zookeeper)) {
-            idGen = new SnowflakeIDGenImpl(name, port, workerId, new SnowflakeZookeeperHolder(name, String.valueOf(port), address));
+    public SnowflakeService(SnowflakeResource resource, SnowflakeNodeHolder holder) throws InitException {
+        if (resource.getServerType().equals(WorkIdServerType.local)) {
+            idGen = new SnowflakeIDGenImpl(resource.getWorkerId());
         } else {
-            idGen = new SnowflakeIDGenImpl(name, port, workerId, new SnowflakeZookeeperHolder(name, String.valueOf(port), address));
+            idGen = new SnowflakeIDGenImpl(resource, holder);
         }
         if (idGen.init()) {
             log.info("Snowflake Service Init Successfully");

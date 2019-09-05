@@ -7,19 +7,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "snowflake.plus")
 public class SnowflakePlusProperties {
 
-    private ServerType serverType = ServerType.local;
+    private WorkIdServerType serverType = WorkIdServerType.local;
 
-    private int workerId = 0;
+    private long workerId = 0L;
 
     private String name;
 
-    private int port;
+    private int listenPort;
 
     private String address;
-
-    enum ServerType {
-        local,
-        zookeeper,
-        other
-    }
 }

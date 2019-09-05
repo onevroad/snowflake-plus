@@ -41,21 +41,35 @@ public class SnowflakeIDGenImpl implements SnowflakeIDGen {
 
     private static final Random RANDOM = new Random();
 
-    public SnowflakeIDGenImpl(String name, String zkAddress, Integer port, Integer workerId) {
-        SnowflakeZookeeperHolder holder = new SnowflakeZookeeperHolder(name, IpUtils.getIp(), String.valueOf(port), zkAddress);
+    public SnowflakeIDGenImpl(int workerId) {
+        this.workerId = workerId;
+        checkWorkId();
+    }
+
+    public SnowflakeIDGenImpl(String name, int port, int workerId, SnowflakeNodeHolder holder) {
+        SnowflakeLocalConfigService localConfigService = new SnowflakeLocalConfigService(name, String.valueOf(port));
         boolean initFlag = holder.init();
         if (initFlag) {
             this.initFlag = true;
-            this.workerId = holder.getWorkerID();
+            this.workerId = holder.getWorkerId();
             log.info("START SUCCESS USE ZK WORKERID-{}", this.workerId);
         } else {
-            this.workerId = workerId;
-            if (workerId == 0) {
+            try {
+                this.workerId = localConfigService.loadLocalWorkId();
+            } catch (Exception e) {
+                log.error("Read file error ", e);
+                this.workerId = workerId;
+            }
+            if (this.workerId == 0) {
                 log.info("START SUCCESS USE DEFAULT WORKERID-{}", this.workerId);
             } else {
                 log.info("START SUCCESS USE CONFIG WORKERID-{}", this.workerId);
             }
         }
+        checkWorkId();
+    }
+
+    private void checkWorkId() {
         Preconditions.checkArgument(this.workerId >= 0 && this.workerId <= maxWorkerId, "workerID must gte 0 and lte 1023");
     }
 
@@ -111,10 +125,6 @@ public class SnowflakeIDGenImpl implements SnowflakeIDGen {
 
     protected long timeGen() {
         return System.currentTimeMillis();
-    }
-
-    public long getWorkerId() {
-        return workerId;
     }
 
 }

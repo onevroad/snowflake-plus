@@ -5,6 +5,7 @@ spring:
     name: snowflake-plus-sample
 snowflake:
   plus:
+    server-type: zookeeper
     name: snowflake-plus-sample
     port: 8001
-    zk-address: localhost:2181
+    address: localhost:2181

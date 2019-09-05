@@ -1,6 +1,5 @@
 package org.snowflake.plus.samples;
 
-import org.snowflake.plus.core.IdResult;
 import org.snowflake.plus.core.SnowflakeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +12,7 @@ public class SnowflakeIdController {
     private SnowflakeService snowflakeService;
 
     @GetMapping("/snowflake/id/get")
-    public IdResult getId() {
+    public long getId() {
         return snowflakeService.getId();
     }
 }

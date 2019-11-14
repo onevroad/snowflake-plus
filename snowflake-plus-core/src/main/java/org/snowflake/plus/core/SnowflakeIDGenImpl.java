@@ -45,6 +45,12 @@ public class SnowflakeIDGenImpl implements SnowflakeIDGen {
         checkWorkId();
     }
 
+    public SnowflakeIDGenImpl(String workerId) {
+        this.workerId = Long.parseLong(workerId);
+        log.info("START SUCCESS USE IP LAST NUMBER WORKERID-{}", this.workerId);
+        checkWorkId();
+    }
+
     public SnowflakeIDGenImpl(SnowflakeResource resource, SnowflakeNodeHolder holder) {
         SnowflakeLocalConfigService localConfigService = new SnowflakeLocalConfigService(resource);
         boolean initFlag = holder.init();

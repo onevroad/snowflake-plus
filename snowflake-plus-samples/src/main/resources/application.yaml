@@ -5,7 +5,11 @@ spring:
     name: snowflake-plus-sample
 snowflake:
   plus:
-    server-type: local
+    #local: 本地配置模式，zookeeper: 注册中心模式，ip: IP地址模式
+    server-type: zookeeper
+    #应用注册名
     name: snowflake-plus-sample
+    #应用注册端口
     listen-port: 8001
+    #zookeeper地址
     address: localhost:2181

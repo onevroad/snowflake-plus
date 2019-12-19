@@ -10,7 +10,7 @@
 <dependency>
     <groupId>org.onevroad</groupId>
     <artifactId>snowflake-plus-core</artifactId>
-    <version>0.1.1</version>
+    <version>0.2.0-SNAPSHOT</version>
 </dependency>
 ```
 - 添加zookeeper依赖
@@ -26,6 +26,9 @@
 ```yaml
 snowflake:
   plus:
+    #local: 本地配置模式，zookeeper: 注册中心模式，ip: IP地址模式
+    server-type: zookeeper
+    #注册中心模式需要以下配置参数
     #应用注册名
     name: snowflake-plus-sample
     #应用注册端口
@@ -49,4 +52,4 @@ public class IdProducer {
 ```
 
 ## Feature
-- 支持其他的注册中心（Eureka，Consul等）
+- 支持其他的配置模式

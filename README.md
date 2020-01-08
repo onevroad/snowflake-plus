@@ -6,7 +6,7 @@ This is a id generator which use the snowflake algorithm. It's developed by spri
 There is three types for the component.
 - local: The work-id will be got from your local application's properties file.
 - zookeeper: The work-id will be registered to your zookeeper server.
-- ip: The work-id will be got by the last part of your local server's IP.Example: If your IP is 192.168.1.200, the work-id is 200.
+- ip: The work-id will be got by the last part of your local server's IP. For example: If your IP is 192.168.1.200, the work-id is 200.
 
 ## Quick Start
 - add maven dependency

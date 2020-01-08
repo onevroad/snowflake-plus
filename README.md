@@ -1,11 +1,15 @@
 # snowflake-plus [![License](http://img.shields.io/:license-apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
-参照美团的snowflake方案设计的，结合了spring-boot，开箱即用, 无需配置workId
+This is a id generator which use the snowflake algorithm. It's developed by spring-boot. This component works without configuring work-id. The idea of this component came from Meituan tech who designed the snowflake id with zookeeper.
 
-所有workId都通过zookeeper管理，且第一次获取workId后，会在本地备份一份，以防zookeeper挂掉
+## Work Type
+There is three types for the component.
+- local: The work-id will be got from your local application's properties file.
+- zookeeper: The work-id will be registered to your zookeeper server.
+- ip: The work-id will be got by the last part of your local server's IP.Example: If your IP is 192.168.1.200, the work-id is 200.
 
-## 快速开始
-- 导入依赖
+## Quick Start
+- add maven dependency
 ```xml
 <dependency>
     <groupId>org.onevroad</groupId>
@@ -13,7 +17,7 @@
     <version>0.2.0</version>
 </dependency>
 ```
-- 添加zookeeper依赖
+- add zookeeper's dependency(if your work-type is zookeeper)
 ```xml
 <dependency>
     <groupId>org.apache.curator</groupId>
@@ -22,22 +26,24 @@
 </dependency>
 ```
 
-- 添加配置
+- add config
 ```yaml
 snowflake:
   plus:
-    #local: 本地配置模式，zookeeper: 注册中心模式，ip: IP地址模式
+    #local，zookeeper，ip. Default is local.
     work-type: zookeeper
-    #注册中心模式需要以下配置参数
-    #应用注册名
+    #If your work-type is local, you need configure the work-id
+    worker-id: 1
+    #If your work-type is zookeeper, you need configure the following parameters
+    #application's registered name
     name: snowflake-plus-sample
-    #应用注册端口
+    #application's registered port
     port: 8001
-    #zookeeper地址
+    #the zookeeper address
     zk-address: localhost:2181
 ```
 
-- 获取ID
+- get ID
 ```java
 @RestController
 public class SnowflakeIdController {
@@ -53,4 +59,4 @@ public class SnowflakeIdController {
 ```
 
 ## Feature
-- 支持其他的配置模式
+- support other work-type

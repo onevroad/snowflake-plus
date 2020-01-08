@@ -7,7 +7,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class SnowflakeResource {
 
-    private WorkIdServerType serverType;
+    private WorkType serverType;
 
     private long workerId;
 

@@ -6,7 +6,7 @@ spring:
 snowflake:
   plus:
     #local: 本地配置模式，zookeeper: 注册中心模式，ip: IP地址模式
-    server-type: zookeeper
+    work-type: zookeeper
     #应用注册名
     name: snowflake-plus-sample
     #应用注册端口

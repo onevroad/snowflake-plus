@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "snowflake.plus")
 public class SnowflakePlusProperties {
 
-    private WorkIdServerType serverType = WorkIdServerType.local;
+    private WorkType workType = WorkType.local;
 
     private long workerId = 0L;
 

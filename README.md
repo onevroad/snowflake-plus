@@ -1,4 +1,4 @@
-# snowflake-plus[![License](http://img.shields.io/:license-apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
+# snowflake-plus [![License](http://img.shields.io/:license-apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 参照美团的snowflake方案设计的，结合了spring-boot，开箱即用, 无需配置workId
 
@@ -10,7 +10,7 @@
 <dependency>
     <groupId>org.onevroad</groupId>
     <artifactId>snowflake-plus-core</artifactId>
-    <version>0.2.0-SNAPSHOT</version>
+    <version>0.2.0</version>
 </dependency>
 ```
 - 添加zookeeper依赖
@@ -27,7 +27,7 @@
 snowflake:
   plus:
     #local: 本地配置模式，zookeeper: 注册中心模式，ip: IP地址模式
-    server-type: zookeeper
+    work-type: zookeeper
     #注册中心模式需要以下配置参数
     #应用注册名
     name: snowflake-plus-sample
@@ -39,14 +39,15 @@ snowflake:
 
 - 获取ID
 ```java
-@Component
-public class IdProducer {
+@RestController
+public class SnowflakeIdController {
+
     @Autowired
     private SnowflakeService snowflakeService;
 
-    
-    public Long getId() {
-        return snowflakeService.getId().getId();
+    @GetMapping("/snowflake/id/get")
+    public long getId() {
+        return snowflakeService.getId();
     }
 }
 ```

@@ -1,6 +1,6 @@
 package org.snowflake.plus.core;
 
-public enum WorkIdServerType {
+public enum WorkType {
     local,
     zookeeper,
     ip

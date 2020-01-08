@@ -1,4 +1,4 @@
-# snowflake-plus[![License](http://img.shields.io/:license-apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
+# snowflake-plus [![License](http://img.shields.io/:license-apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 参照美团的snowflake方案设计的，结合了spring-boot，开箱即用, 无需配置workId
 

@@ -45,7 +45,7 @@
     <commons-io.version>2.4</commons-io.version>
     <guava.version>28.0-jre</guava.version>
     <curator.version>4.2.0</curator.version>
-    <jackson-databind.version>2.9.9.2</jackson-databind.version>
+    <jackson-databind.version>2.9.10.4</jackson-databind.version>
   </properties>
   <dependencyManagement>
     <dependencies>

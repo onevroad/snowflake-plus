@@ -9,6 +9,12 @@ public class SnowflakeResource {
 
     private WorkType serverType;
 
+    private long startTime;
+
+    private long workerIdBits;
+
+    private long sequenceBits;
+
     private long workerId;
 
     private String name;

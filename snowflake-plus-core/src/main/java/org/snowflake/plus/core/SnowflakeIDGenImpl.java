@@ -11,25 +11,25 @@ public class SnowflakeIDGenImpl implements SnowflakeIDGen {
     /**
      * 初始时间：2019-07-18 08:00:00 (UTC+8)
      */
-    private final long twepoch = 1563408000000L;
+    private long startTime;
     /**
      * workerId的bit位数
      */
-    private final long workerIdBits = 10L;
+    private long workerIdBits;
     /**
-     * 最大能够分配的workerId =1023
+     * 最大能够分配的workerId，8bit为255
      */
-    private final long maxWorkerId = ~(-1L << workerIdBits);
+    private long maxWorkerId;
     /**
      * sequence的bit位数
      */
-    private final long sequenceBits = 12L;
+    private long sequenceBits;
 
-    private final long workerIdShift = sequenceBits;
+    private long workerIdShift;
 
-    private final long timestampLeftShift = sequenceBits + workerIdBits;
+    private long timestampLeftShift;
 
-    private final long sequenceMask = ~(-1L << sequenceBits);
+    private long sequenceMask;
 
     private long workerId;
 
@@ -39,15 +39,9 @@ public class SnowflakeIDGenImpl implements SnowflakeIDGen {
 
     private static final Random RANDOM = new Random();
 
-    public SnowflakeIDGenImpl(long workerId) {
-        this.workerId = workerId;
-        log.info("START SUCCESS USE CONFIG WORKERID-{}", this.workerId);
-        checkWorkId();
-    }
-
-    public SnowflakeIDGenImpl(String workerId) {
-        this.workerId = Long.parseLong(workerId);
-        log.info("START SUCCESS USE IP LAST NUMBER WORKERID-{}", this.workerId);
+    public SnowflakeIDGenImpl(SnowflakeResource resource) {
+        init(resource);
+        log.info("START SUCCESS USE " + resource.getServerType().name() + " WORKERID-{}", this.workerId);
         checkWorkId();
     }
 
@@ -55,19 +49,18 @@ public class SnowflakeIDGenImpl implements SnowflakeIDGen {
         SnowflakeLocalConfigService localConfigService = new SnowflakeLocalConfigService(resource);
         boolean initFlag = holder.init();
         if (initFlag) {
-            this.workerId = holder.getWorkerId();
-            resource.setWorkerId(this.workerId);
+            resource.setWorkerId(holder.getWorkerId());
+            init(resource);
             log.info("START SUCCESS USE {} WORKERID-{}", resource.getServerType(), this.workerId);
         } else {
             boolean loadFileFlag = false;
             try {
-                this.workerId = localConfigService.loadLocalWorkId();
-                resource.setWorkerId(this.workerId);
+                resource.setWorkerId(localConfigService.loadLocalWorkId());
                 loadFileFlag = true;
             } catch (Exception e) {
                 log.error("Read file error ", e);
-                this.workerId = resource.getWorkerId();
             }
+            init(resource);
             if (loadFileFlag) {
                 log.info("START SUCCESS USE LOCAL FILE WORKERID-{}", this.workerId);
             } else {
@@ -75,6 +68,17 @@ public class SnowflakeIDGenImpl implements SnowflakeIDGen {
             }
         }
         checkWorkId();
+    }
+
+    private void init(SnowflakeResource resource) {
+        this.startTime = resource.getStartTime();
+        this.workerIdBits = resource.getWorkerIdBits();
+        this.maxWorkerId = ~(-1L << this.workerIdBits);
+        this.sequenceBits = resource.getSequenceBits();
+        this.workerIdShift = this.sequenceBits;
+        this.timestampLeftShift = this.sequenceBits + this.workerIdBits;
+        this.sequenceMask = ~(-1L << this.sequenceBits);
+        this.workerId = resource.getWorkerId();
     }
 
     private void checkWorkId() {
@@ -113,7 +117,7 @@ public class SnowflakeIDGenImpl implements SnowflakeIDGen {
             sequence = RANDOM.nextInt(100);
         }
         lastTimestamp = timestamp;
-        long id = ((timestamp - twepoch) << timestampLeftShift) | (workerId << workerIdShift) | sequence;
+        long id = ((timestamp - startTime) << timestampLeftShift) | (workerId << workerIdShift) | sequence;
         return new IdResult(id, Status.SUCCESS);
 
     }

@@ -11,7 +11,7 @@ public class SnowflakeService {
 
     public SnowflakeService(SnowflakeResource resource, SnowflakeNodeHolder holder) throws InitException {
         if (resource.getServerType().equals(WorkType.local)) {
-            idGen = new SnowflakeIDGenImpl(resource.getWorkerId());
+            idGen = new SnowflakeIDGenImpl(resource);
         } else if (resource.getServerType().equals(WorkType.ip)) {
             String ip = IpUtils.getIp();
             if (StringUtils.isEmpty(ip)) {
@@ -19,7 +19,8 @@ public class SnowflakeService {
             }
             String[] ipSegments = ip.split("\\.");
             String workId = ipSegments[ipSegments.length - 1];
-            idGen = new SnowflakeIDGenImpl(workId);
+            resource.setWorkerId(Long.parseLong(workId));
+            idGen = new SnowflakeIDGenImpl(resource);
         } else if (resource.getServerType().equals(WorkType.zookeeper)) {
             idGen = new SnowflakeIDGenImpl(resource, holder);
         } else {

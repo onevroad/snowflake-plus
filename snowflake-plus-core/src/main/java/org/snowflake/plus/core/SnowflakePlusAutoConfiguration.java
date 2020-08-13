@@ -18,7 +18,8 @@ public class SnowflakePlusAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public SnowflakeResource snowflakeResource() {
-        return new SnowflakeResource(properties.getWorkType(), properties.getWorkerId(), properties.getName(), String.valueOf(properties.getListenPort()), properties.getAddress());
+        return new SnowflakeResource(properties.getWorkType(), properties.getStartTime(), properties.getWorkerIdBits(), properties.getSequenceBits(),
+                properties.getWorkerId(), properties.getName(), String.valueOf(properties.getListenPort()), properties.getAddress());
     }
 
     @Bean

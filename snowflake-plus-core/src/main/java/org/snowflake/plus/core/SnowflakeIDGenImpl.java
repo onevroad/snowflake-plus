@@ -8,21 +8,14 @@ import java.util.Random;
 @Slf4j
 public class SnowflakeIDGenImpl implements SnowflakeIDGen {
 
-    /**
-     * 初始时间：2019-07-18 08:00:00 (UTC+8)
-     */
     private long startTime;
-    /**
-     * workerId的bit位数
-     */
+
     private long workerIdBits;
     /**
-     * 最大能够分配的workerId，8bit为255
+     * the max number of workerId, 8bit is 255
      */
     private long maxWorkerId;
-    /**
-     * sequence的bit位数
-     */
+
     private long sequenceBits;
 
     private long workerIdShift;

@@ -13,3 +13,9 @@ snowflake:
     listen-port: 8001
     #zookeeper地址
     address: localhost:2181
+    #ID生成的初始时间
+    start-time: 1564617600000
+    #workerId的bit位数
+    worker-id-bits: 8
+    #sequence的bit位数
+    sequence-bits: 12

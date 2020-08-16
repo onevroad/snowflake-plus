@@ -14,7 +14,7 @@ There is three types for the component.
 <dependency>
     <groupId>org.onevroad</groupId>
     <artifactId>snowflake-plus-core</artifactId>
-    <version>0.3.0-SNAPSHOT</version>
+    <version>0.3.0</version>
 </dependency>
 ```
 - add zookeeper's dependency(if your work-type is zookeeper)

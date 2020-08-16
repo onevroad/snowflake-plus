@@ -10,7 +10,7 @@
 <dependency>
     <groupId>org.onevroad</groupId>
     <artifactId>snowflake-plus-core</artifactId>
-    <version>0.3.0-SNAPSHOT</version>
+    <version>0.3.0</version>
 </dependency>
 ```
 - 添加zookeeper依赖(配置模式为zookeeper)

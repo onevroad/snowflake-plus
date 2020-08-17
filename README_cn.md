@@ -28,6 +28,12 @@ snowflake:
   plus:
     #local: 本地配置模式，zookeeper: 注册中心模式，ip: IP地址模式
     work-type: zookeeper
+    #ID生成的初始时间，默认为2019-08-01 08:00:00 (UTC+8)
+    start-time: 1564617600000
+    #workerId的bit位数，默认为8bit
+    worker-id-bits: 8
+    #sequence的bit位数，默认为12bit
+    sequence-bits: 12
     #注册中心模式需要以下配置参数
     #应用注册名
     name: snowflake-plus-sample

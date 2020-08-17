@@ -32,6 +32,12 @@ snowflake:
   plus:
     #local，zookeeper，ip. Default is local.
     work-type: zookeeper
+    #initial start time, default: 2019-08-01 00:00:00 (UTC)
+    start-time: 1564617600000
+    #the number of bit for worker id, default: 8bit
+    worker-id-bits: 8
+    #the number of bit for sequence, default: 12bit
+    sequence-bits: 12
     #If your work-type is local, you need configure the work-id
     worker-id: 1
     #If your work-type is zookeeper, you need configure the following parameters

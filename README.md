@@ -1,9 +1,9 @@
 # snowflake-plus [![License](http://img.shields.io/:license-apache-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
-This is a id generator which use the snowflake algorithm. It's developed by spring-boot. This component works without configuring work-id. The idea of this component came from Meituan tech who designed the snowflake id with zookeeper.
+This is an id generator which use the snowflake algorithm. It's developed by spring-boot. This component works without configuring work-id. The idea of this component came from Meituan tech who designed the snowflake id with zookeeper.
 
 ## Work Type
-There is three types for the component.
+There are three types for the component.
 - local: The work-id will be got from your local application's properties file.
 - zookeeper: The work-id will be registered to your zookeeper server.
 - ip: The work-id will be got by the last part of your local server's IP. For example: If your IP is 192.168.1.200, the work-id is 200.

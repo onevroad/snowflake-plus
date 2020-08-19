@@ -102,12 +102,12 @@ public class SnowflakeIDGenImpl implements SnowflakeIDGen {
             sequence = (sequence + 1) & sequenceMask;
             if (sequence == 0) {
                 //seq 为0的时候表示是下一毫秒时间开始对seq做随机
-                sequence = RANDOM.nextInt(100);
+                sequence = RANDOM.nextInt(10);
                 timestamp = tilNextMillis(lastTimestamp);
             }
         } else {
             //如果是新的ms开始
-            sequence = RANDOM.nextInt(100);
+            sequence = RANDOM.nextInt(10);
         }
         lastTimestamp = timestamp;
         long id = ((timestamp - startTime) << timestampLeftShift) | (workerId << workerIdShift) | sequence;

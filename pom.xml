@@ -43,7 +43,7 @@
     <spring-boot.version>2.1.5.RELEASE</spring-boot.version>
     <perf4j.version>0.9.16</perf4j.version>
     <commons-io.version>2.4</commons-io.version>
-    <guava.version>28.0-jre</guava.version>
+    <guava.version>29.0-jre</guava.version>
     <curator.version>4.2.0</curator.version>
     <jackson-databind.version>2.9.10.5</jackson-databind.version>
   </properties>
